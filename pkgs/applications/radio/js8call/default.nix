@@ -3,7 +3,7 @@
 , fetchFromBitbucket
 , wrapQtAppsHook
 , pkg-config
-, hamlib
+, hamlib_4
 , libusb1
 , cmake
 , gfortran
@@ -33,7 +33,7 @@ stdenv.mkDerivation rec {
   ];
 
   buildInputs = [
-    hamlib
+    hamlib_4
     libusb1
     fftw
     fftwFloat

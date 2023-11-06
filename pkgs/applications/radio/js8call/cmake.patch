@@ -3,7 +3,7 @@ index 1590f05..e797851 100644
 --- a/CMake/Modules/Findhamlib.cmake
 +++ b/CMake/Modules/Findhamlib.cmake
 @@ -47,7 +47,7 @@ if (NOT PC_HAMLIB_FOUND)
- 
+
    # libusb-1.0 has no pkg-config file on Windows so we have to find it
    # ourselves
 -  find_library (LIBUSB NAMES usb-1.0 PATH_SUFFIXES MinGW32/dll)
@@ -28,7 +28,7 @@ index 75b80b3..7c04265 100644
  find_package (Qt5Multimedia 5 REQUIRED)
  find_package (Qt5PrintSupport 5 REQUIRED)
 +find_package (Qt5SerialPort 5 REQUIRED)
- 
+
  if (WIN32)
    add_definitions (-DQT_NEEDS_QTMAIN)
 @@ -849,7 +850,7 @@ target_link_libraries (qcp Qt5::Widgets Qt5::PrintSupport)
@@ -45,15 +45,15 @@ index 75b80b3..7c04265 100644
    endif ()
  endif ()
 -qt5_use_modules (js8call SerialPort) # not sure why the interface link library syntax above doesn't work
- 
+
  # if (UNIX)
  #   if (NOT WSJT_SKIP_MANPAGES)
 @@ -1292,3 +1292,5 @@ configure_file ("${PROJECT_SOURCE_DIR}/CMakeCPackOptions.cmake.in"
  set (CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/CMakeCPackOptions.cmake")
- 
+
  include (CPack)
 +
-+add_definitions (-DJS8_USE_HAMLIB_THREE)
++
 diff --git a/Configuration.cpp b/Configuration.cpp
 index 8258f97..63a29bb 100644
 --- a/Configuration.cpp
@@ -67,3 +67,21 @@ index 8258f97..63a29bb 100644
  #include <QScopedPointer>
  #include <QDateTimeEdit>
  #include <QProcess>
+
+# diff --git a/qt_helpers.hpp b/qt_helpers.hpp
+# index 1234567..89abcde 100644
+# --- a/qt_helpers.hpp
+# +++ b/qt_helpers.hpp
+# @@ -102,7 +102,7 @@
+ 
+#    static QVariant asQVariant(T * ptr)
+#    {
+# -    return qVariantFromValue (reinterpret_cast<void *> (ptr));
+# +    return QVariant::fromValue(reinterpret_cast<void *> (ptr));
+#    }
+#  };
+ 
+#  // Register some useful Qt types with QMetaType
+#  Q_DECLARE_METATYPE (QHostAddress);
+ 
+#  #endif
