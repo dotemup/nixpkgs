@@ -1,18 +1,22 @@
 { lib
 , stdenv
-, fetchurl
-, perl
-, swig
-, gd
-, ncurses
-, python3
-, libxml2
-, tcl
-, libusb-compat-0_1
-, pkg-config
-, boost
+, fetchgit
+, autoconf
+, automake
 , libtool
+, pkg-config
+, swig
+, perl
+, python3
+, ncurses
+, tcl
+, libxml2
+, gd
+, libusb1
+, readline
+, boost
 , perlPackages
+, xmlSupport ? true
 , pythonBindings ? true
 , tclBindings ? true
 , perlBindings ? true
@@ -22,29 +26,42 @@ stdenv.mkDerivation rec {
   pname = "hamlib";
   version = "4.5.5";
 
-  src = fetchurl {
-    url = "mirror://sourceforge/${pname}/${pname}-${version}.tar.gz";
-    sha256 = "sha256-YByJ8y7SJelSet49ZNDQXSMgLAWuIf+nflnXDuRZf80=";
+  src = fetchgit {
+    url = "https://github.com/${pname}/${pname}.git";
+    rev = "refs/tags/${version}";
+    sha256 = "sha256-XLoNy+A0oNKGlQEVcevOTFHg71jJldr2r8rn88An5/w=";
   };
 
+  preConfigure = ''
+    ./bootstrap
+  '';
+
   nativeBuildInputs = [
-    swig
-    pkg-config
+    autoconf
+    automake
     libtool
-  ];
+    pkg-config
+    swig
+  ] ++ lib.optionals perlBindings [ perl ]
+    ++ lib.optionals tclBindings [ tcl ]
+    ++ lib.optionals perlBindings [ python3 ];  
 
   buildInputs = [
+    readline
+    ncurses
     gd
-    libxml2
-    libusb-compat-0_1
+    libusb1
     boost
-  ] ++ lib.optionals pythonBindings [ python3 ncurses ]
+  ] ++ lib.optionals perlBindings [ perl perlPackages.ExtUtilsMakeMaker ]
     ++ lib.optionals tclBindings [ tcl ]
-    ++ lib.optionals perlBindings [ perl perlPackages.ExtUtilsMakeMaker ];
+    ++ lib.optionals pythonBindings [ python3 ]
+    ++ lib.optionals xmlSupport [ libxml2 ];
+    
 
   configureFlags = lib.optionals perlBindings [ "--with-perl-binding" ]
     ++ lib.optionals tclBindings [ "--with-tcl-binding" "--with-tcl=${tcl}/lib/" ]
-    ++ lib.optionals pythonBindings [ "--with-python-binding" ];
+    ++ lib.optionals pythonBindings [ "--with-python-binding" ]
+    ++ lib.optionals xmlSupport [ "--with-xml-support"];
 
   meta = with lib; {
     description = "Runtime library to control radio transceivers and receivers";
